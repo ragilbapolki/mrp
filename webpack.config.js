@@ -1,6 +1,6 @@
 const path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
-const TerserPlugin = require('terser-webpack-plugin'); // Untuk optimasi produksi
+const TerserPlugin = require('terser-webpack-plugin');
 
 function resolve(dir) {
   return path.join(__dirname, '/resources/js', dir);
