@@ -1,29 +1,28 @@
 const path = require('path');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const TerserPlugin = require('terser-webpack-plugin'); // Untuk optimasi produksi
 
 function resolve(dir) {
-  return path.join(
-    __dirname,
-    '/resources/js',
-    dir
-  );
+  return path.join(__dirname, '/resources/js', dir);
 }
 
 const rawArgv = process.argv.slice(2);
-const args = rawArgv.join(' ');
 const report = rawArgv.includes('--report');
+
 let plugins = [];
 if (report) {
   plugins.push(new BundleAnalyzerPlugin({
     openAnalyzer: true,
   }));
 }
+
 module.exports = {
+  mode: 'production', 
   resolve: {
     extensions: ['.js', '.vue', '.json'],
     alias: {
       vue$: 'vue/dist/vue.esm.js',
-      '@': path.join(__dirname, '/resources/js'),
+      '@': resolve(''),
     },
   },
   module: {
@@ -39,8 +38,21 @@ module.exports = {
     ],
   },
   plugins: plugins,
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin({
+      terserOptions: {
+        compress: { drop_console: true }, 
+      },
+    })],
+    splitChunks: {
+      chunks: 'all',
+    },
+  },
   output: {
-    filename: '[name].js',
-    chunkFilename: 'js/app.[chunkhash:6].js',
+    path: path.resolve(__dirname, 'public'),
+    publicPath: '/', 
+    filename: 'js/[name].[contenthash:8].js',
+    chunkFilename: 'js/[name].[contenthash:8].js',
   },
 };
